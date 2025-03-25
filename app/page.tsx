@@ -17,7 +17,6 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-// Removed @fillout/react dependency
 
 export default function Home() {
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -362,7 +361,13 @@ export default function Home() {
   )
 }
 
-function FeatureCard({ icon, title, description }) {
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
     <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
       <div className="mb-4">{icon}</div>
@@ -372,7 +377,11 @@ function FeatureCard({ icon, title, description }) {
   )
 }
 
-function PricingItem({ text }) {
+interface PricingItemProps {
+  text: string;
+}
+
+function PricingItem({ text }: PricingItemProps) {
   return (
     <li className="flex items-start">
       <Check className="h-5 w-5 text-[#00FFFF] mr-2 mt-0.5" />
