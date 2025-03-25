@@ -17,8 +17,7 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { FilloutPopupEmbed } from "@fillout/react"
-import "@fillout/react/style.css"
+// Removed @fillout/react dependency
 
 export default function Home() {
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -304,8 +303,61 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Fillout Form Popup */}
-      <FilloutPopupEmbed filloutId="1DBHRinjKwus" isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
+      {/* Contact Form Modal */}
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Contact Us</h3>
+              <button 
+                onClick={() => setIsFormOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mb-4 text-gray-600">
+              Thank you for your interest! Please fill out the form below and we'll get back to you within 24 hours.
+            </p>
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input 
+                  type="text" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FFFF]" 
+                  placeholder="Your name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input 
+                  type="email" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FFFF]" 
+                  placeholder="your@email.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                <textarea 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FFFF]" 
+                  rows={4}
+                  placeholder="Tell us about your project..."
+                ></textarea>
+              </div>
+              <Button 
+                className="w-full bg-[#00FFFF] hover:bg-[#00FFFF]/90 text-[#06061A]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsFormOpen(false);
+                  alert("Thanks for your interest! This is a demo form - in a real application, your message would be sent.");
+                }}
+              >
+                Submit
+              </Button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -328,4 +380,3 @@ function PricingItem({ text }) {
     </li>
   )
 }
-
