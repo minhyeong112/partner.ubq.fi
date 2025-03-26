@@ -22,29 +22,81 @@ import "@fillout/react/style.css"
 
 export default function Home() {
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [daysLeft, setDaysLeft] = useState(3)
-  const [hoursLeft, setHoursLeft] = useState(14)
-  const [minutesLeft, setMinutesLeft] = useState(22)
-
-  // Simulate countdown timer
+  const [daysLeft, setDaysLeft] = useState(0)
+  const [hoursLeft, setHoursLeft] = useState(0)
+  const [minutesLeft, setMinutesLeft] = useState(0)
+  const [secondsLeft, setSecondsLeft] = useState(0)
+  
+  // Calculate end of week (Sunday 11:59 PM)
+  const getEndOfWeek = (): Date => {
+    const now = new Date()
+    const dayOfWeek = now.getDay() // 0 = Sunday, 1 = Monday, etc.
+    const daysUntilEndOfWeek = dayOfWeek === 0 ? 7 : 7 - dayOfWeek // If today is Sunday, set to next Sunday
+    
+    const endOfWeek = new Date(now)
+    endOfWeek.setDate(now.getDate() + daysUntilEndOfWeek)
+    endOfWeek.setHours(23, 59, 59, 999)
+    
+    return endOfWeek
+  }
+  
+  // Format date as "Month Day(th/st/nd/rd)"
+  const formatDate = (date: Date): string => {
+    const day = date.getDate()
+    const month = date.toLocaleString('default', { month: 'long' })
+    
+    // Add appropriate suffix to day
+    let suffix = 'th'
+    if (day % 10 === 1 && day !== 11) {
+      suffix = 'st'
+    } else if (day % 10 === 2 && day !== 12) {
+      suffix = 'nd'
+    } else if (day % 10 === 3 && day !== 13) {
+      suffix = 'rd'
+    }
+    
+    return `${month} ${day}${suffix}`
+  }
+  
+  // Calculate and update countdown timer
+  const updateCountdown = (): void => {
+    const now = new Date()
+    const endOfWeek = getEndOfWeek()
+    const timeDiff = endOfWeek.getTime() - now.getTime()
+    
+    if (timeDiff <= 0) {
+      // If we've reached the end of the week, reset to next week
+      setDaysLeft(7)
+      setHoursLeft(0)
+      setMinutesLeft(0)
+      setSecondsLeft(0)
+      return
+    }
+    
+    // Calculate days, hours, minutes, seconds
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000)
+    
+    setDaysLeft(days)
+    setHoursLeft(hours)
+    setMinutesLeft(minutes)
+    setSecondsLeft(seconds)
+  }
+  
+  // Initialize countdown and update every second
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (minutesLeft > 0) {
-        setMinutesLeft(minutesLeft - 1)
-      } else if (hoursLeft > 0) {
-        setHoursLeft(hoursLeft - 1)
-        setMinutesLeft(59)
-      } else if (daysLeft > 0) {
-        setDaysLeft(daysLeft - 1)
-        setHoursLeft(23)
-        setMinutesLeft(59)
-      }
-    }, 60000)
-
+    // Update immediately on load
+    updateCountdown()
+    
+    // Then update every second
+    const timer = setInterval(updateCountdown, 1000)
+    
     return () => clearInterval(timer)
-  }, [daysLeft, hoursLeft, minutesLeft])
+  }, [])
 
-  const openForm = () => {
+  const openForm = (): void => {
     setIsFormOpen(true)
   }
 
@@ -64,7 +116,7 @@ export default function Home() {
             <a href="#pricing" className="text-sm font-medium text-gray-300 hover:text-[#00FFFF]">
               Pricing
             </a>
-            <a href="#contact" className="text-sm font-medium text-gray-300 hover:text-[#00FFFF]">
+            <a href="#contact" className="text-sm font-medium text-gray-300 hover:text-[#00FFFF]" onClick={openForm}>
               Contact
             </a>
           </nav>
@@ -106,7 +158,7 @@ export default function Home() {
             </div>
             <div className="bg-[#00FFFF]/10 p-4 rounded-lg inline-block">
               <p className="text-[#00FFFF] font-semibold">
-                Next enrollment window closes in: {daysLeft}d {hoursLeft}h {minutesLeft}m
+                Next enrollment window closes in: {daysLeft}d {hoursLeft}h {minutesLeft}m {secondsLeft}s
               </p>
             </div>
           </div>
@@ -280,8 +332,7 @@ export default function Home() {
               Schedule a demo to see how Ubiquity can help manage your GitHub repositories and development team.
             </p>
             <p className="text-[#00FFFF] font-semibold mb-8">
-              Limited time offer: Skip the waitlist if you sign up before {new Date().getDate() + 3}/
-              {new Date().getMonth() + 1}
+              Limited time offer: Skip the waitlist if you sign up before {formatDate(getEndOfWeek())}
             </p>
             <Button size="lg" className="bg-[#00FFFF] hover:bg-[#00FFFF]/90 text-[#06061A]" onClick={openForm}>
               Contact Us Today
